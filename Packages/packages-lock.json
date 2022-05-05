@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.private.photon-sdk": {
+      "version": "git+ssh://git@github.com/eyedropsP/PrivatePhotonSdk.git?path=Assets/Plugins",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d71d22f093082a235583531f1726e742cb220fa2"
+    },
     "com.unity.collab-proxy": {
       "version": "1.15.1",
       "depth": 0,
