@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  pull_request: { }
+  push: { branches: [ main ] }
+
+jobs:
+  build:
+    name: Run the Unity build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - WebGL # WebGL.
+
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      
+      # Cache
+      - name: Cache
+        id: cache-library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      # Accessing private repos
+      - name: SSH
+        uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      # Build
+      - name: Build
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          sshAgent: ${{ env.SSH_AUTH_SOCK }}
+
+      # Upload Build
+      - name: Upload Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build
+          path: build
